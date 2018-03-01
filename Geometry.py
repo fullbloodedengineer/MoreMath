@@ -53,7 +53,7 @@ class orderEdgeLoop:
         '''Verify that the loop is valid'''
         for i,edge in enumerate(self.edgeLooap):
             vEnd = edge.vertexA
-            vNext = edge[self.wrapAround(i,1)].vertexA
+            vNext = edge[self.wrapAroundIndex(i,1)].vertexA
             if not vEnd == vNext:
                 return False       
         return True
