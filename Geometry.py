@@ -10,7 +10,11 @@ class vertex:
             pass
 
     def __eq__(self, other): 
-        return self.pos == other.pos
+        return numpself.pos == other.pos
+
+    def coincident(self, other, tol=1e-2):
+        test = np.isClose(self.pos,other.pos,rtol=tol)
+        return (test[0] and test[0])
 
     def distanceToVertex(self, other):
         return numpy.linalg.norm(self.pos-other.pos)
@@ -45,6 +49,7 @@ class edge:
         dp = self.vertexA - other.vertexA
         dap = self.perpendicular(a)
         denom = np.dot(dap,db)
+        if denom 
         num = np.dot(dap,dp)
         return (num / denom.astype(float))*db + other.vertexA
 
@@ -68,12 +73,15 @@ class orderEdgeLoop:
    
     def isLoop(self):
         '''Verify that the loop is valid'''
-        for i,edge in enumerate(self.edgeLooap):
-            vEnd = edge.vertexA
-            vNext = edge[self.wrapAroundIndex(i,1)].vertexA
-            if not vEnd == vNext:
-                return False       
-        return True
+        if len(self.edgeLoop) == 0:
+            return False
+        else:
+            for i,edge in enumerate(self.edgeLooap):
+                vEnd = edge.vertexA
+                vNext = edge[self.wrapAroundIndex(i,1)].vertexA
+                if not vEnd == vNext:
+                    return False       
+            return True
 
     def findEdge(self,edge):
         for i,_edge in enumerate(self.edgeLoop):
@@ -91,6 +99,7 @@ class orderEdgeLoop:
         return (i+loc) % len(self.edgeLoop)
 
 class face:
+    '''A face'''
     def __init__(self,edgeLoop=None,name=None):
         self.uid = 1
         self.name = name
@@ -98,6 +107,9 @@ class face:
 
     def teselateFace(self):
         pass
+
+    def normal(self):
+        return np.array([1,0,0])
 
 class mesh:
     def __init__(self,name):
