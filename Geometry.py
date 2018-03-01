@@ -1,16 +1,25 @@
 import numpy as np
+class uid:
+    def __init__(self):
+        self.uid = nextVal
+        nextVal += 1
 
-class vertex:
+class vertex(uid):
     def __init__(self,loc):
-        self.uid = 1
-        if len(loc) == 3: #isinstance(loc,'list')
+        #print type(loc),type(np.ndarray)
+        if isinstance(loc, np.ndarray):
+            self.pos = loc
+        elif len(loc) == 3: #isinstance(loc,'list')
             self.pos = np.array(loc,dtype=float)
-        else:
-            #TODO Raise error for invalid type cast
-            pass
+            
+    def __str__(self):
+        return str((self.pos[0],self.pos[1],self.pos[2]))
 
+    def __sub__(self,other):
+        return np.subtract(self.pos,other.pos)
+                    
     def __eq__(self, other): 
-        return numpself.pos == other.pos
+        return np.array_equal(self.pos,other.pos)
 
     def coincident(self, other, tol=1e-2):
         test = np.isClose(self.pos,other.pos,rtol=tol)
@@ -24,37 +33,63 @@ class edge:
         self.vertexA = vertexA
         self.vertexB = vertexB
 
+    def __str__(self):
+        return str(self.vertexA) + "," + str(self.vertexB)
+        
     def __eq__(self, other):
         A = (self.vertexA == other.vertexA) or (self.vertexA == other.vertexB)
         B = (self.vertexB == other.vertexA) or (self.vertexB == other.vertexB)
         return (A and B)
 
-    def vertexInEdge(self,vertex,tol=0.01):
+    def getLength(self):
+        return self.vertexA.distanceToVertex(self.vertexB)
+                
+    def vertexInEdge(self,vertex,tol=0.00):
         AB = self.vertexA.distanceToVertex(self.vertexB)
         AV = self.vertexA.distanceToVertex(vertex)
         VB = vertex.distanceToVertex(self.vertexB)
-
-        return (AB + tol >= AV + VB) and (AB - tol <= AV + AB)
+        #print AB,AV,VB,AV+VB
+        return AB == AV + VB
 
     def intersectEdge(self,other):
+        '''
+        L1 = P1 + a V1
+        L2 = P2 + b V2
+        a (V1 X V2) = (P2 - P1) X V2
+        If the lines intersect at a single point, then the resultant vectors 
+        on each side of this equation must be parallel, and the left side must 
+        not be the zero vector. We should check to make sure that this is 
+        true. Once we have checked this, we can solve for 'a' by taking the 
+        magnitude of each side and dividing. If the resultant vectors are 
+        parallel, but in opposite directions, then 'a' is the negative of the 
+        ratio of magnitudes. Once we have 'a' we can go back to the equation 
+        for L1 to find the intersection point.
+        '''
         da = self.vertexB-self.vertexA
+        mag_da = np.linalg.norm(da)
+        dVa = da/mag_da
+        
         db = other.vertexB-other.vertexA
-        dp = self.vertexA - other.vertexA
-        dap = self.perpendicular(a)
-        denom = np.dot(dap,db)
-        if denom != 0: 
-            num = np.dot(dap,dp)
-            return (num / denom.astype(float))*db + other.vertexA
+        mag_db = np.linalg.norm(db)
+        dVb = db/mag_db
+        
+        dp =  other.vertexA -self.vertexA
+        mag_dp = np.linalg.norm(dp)
+        dVp = dp/mag_dp
+                
+        #Left and right side must be parallel, test this cos theta = (dVa * dVb)/(mag_da*mag_db)
+        left = np.cross(dVa,dVb)
+        mag_left = np.linalg.norm(left)
+        right = np.cross(dVp,dVb)
+        mag_right = np.linalg.norm(right)
+        angleBtwn = np.arccos(np.dot(left,right)/(mag_left*mag_right))
+        if angleBtwn == 0.0 or angleBtwn == np.pi:
+            
+            print "Lines will intersect"
         else:
-            return None
-
-    @staticmethod
-    def perpendicular(a):
-        b = np.empty_like(a)
-        b[0] = -a[1]
-        b[1] = a[0]
-        return b
-
+            print "Never intersect"
+        
+        return None
 class orderEdgeLoop:
     def __init__(self,edgeLoop=[]):
         self.edgeLoop = edgeLoop
@@ -128,10 +163,28 @@ class mesh:
             return 9000.0
 
 if __name__ == '__main__':
+    #Test all functions
+    #Vertex Tests
+    #v0 = vertex([0,0,0])
+    #v1 = vertex([0,0,0])
+    #v2 = vertex([0.0,0.0,0.0])
+    #v3 = vertex([0,0,10])
+    #v4 = vertex([1e-12,0,0])           
+    #print "Testing equivilency test for %s" %(v0)
+    #print "  %s: Expect True, Recieved %s" %(v1,v0==v1)
+    #print "  %s: Expect True, Recieved %s" %(v2,v0==v2)
+    #print "  %s: Expect False, Recieved %s" %(v3,v0==v4)
+    #print "  %s: Expect False, Recieved %s" %(v4,v0==v4)
+    
 
-    v1 = vertex([0,0,0])
-    v2 = vertex([0,0,10])
-    v3 = vertex([0,-5,0])
-    v4 = vertex([0,5,0])
-
-
+    v0 = vertex([0,0,0])
+    v1 = vertex([0,0,10])
+    #v2 = vertex([1,0,0])
+    #v3 = vertex([1,0,5])    
+    v2 = vertex([-10,0,0])
+    v3 = vertex([10,0,8])    
+    edge1 = edge(v0,v1)
+    edge2 = edge(v2,v3)
+    print "Testing edge intersection %s and %s" %(edge1,edge2)    
+    print "-->%s" %(edge1.intersectEdge(edge2))
+    #print "-->%s" %(edge2.intersectEdge(edge1))
