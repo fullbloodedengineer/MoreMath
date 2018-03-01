@@ -25,28 +25,45 @@ class edge:
         B = (self.vertexB == other.vertexA) or (self.vertexB == other.vertexB)
         return (A and B)
 
-    def vertexInEdge(self,vertex):
+    def vertexInEdge(self,vertex,tol=0.01):
         AB = self.vertexA.distanceToVertex(self.vertexB)
         AV = self.vertexA.distanceToVertex(vertex)
         VB = vertex.distanceToVertex(self.vertexB)
 
+        return (AB + tol >= AV + VB) and (AB - tol <= AV + AB)
+
+    @static
+    def perpendicular(a):
+        b = np.empty_like(a)
+        b[0] = -a[1]
+        b[1] = a[0]
+        return b
+
+    def intersectEdge(self,other):
+        da = self.vertexB-self.vertexA
+        db = other.vertexB-other.vertexA
+        dp = self.vertexA - other.vertexA
+        dap = self.perpendicular(a)
+        denom = np.dot(dap,db)
+        num = np.dot(dap,dp)
+        return (num / denom.astype(float))*db + other.vertexA
+
 class orderEdgeLoop:
     def __init__(self,edgeLoop=[]):
         self.edgeLoop = edgeLoop
-        if not isLoop:
-            self.edgeLoop = []
-            #TODO raise error for invalid loop
+        self.valid = self.isLoop()
         
-    def insertEdgeIntoLoop(self,edge,after=None)
+    def insertEdgeAfterIndex(self,edge,after=None)
         '''Given an edge, index to insert after'''        
         v1N = edge.vertexA
         v2N = edge.vertexB
-        if not after == None or not before == None:
+        if not after == None:
+            nextIndex = self.wrapAroundIndex(after,1)
             if (
                     v1N == self.edgeLoop[after].vertexB and 
-                    v2N == self.edgeLoop[before].vertexA
+                    v2N == self.edgeLoop[nextIndex].vertexA
                 ):
-                #Inser edge into loop
+                #Insert edge into loop
                 self.edgeLoop.insert(edge,after)
    
     def isLoop(self):
@@ -57,7 +74,18 @@ class orderEdgeLoop:
             if not vEnd == vNext:
                 return False       
         return True
+
+    def findEdge(self,edge):
+        for i,_edge in enumerate(self.edgeLoop):
+            if _edge == edge:
+                return i
+        return None
             
+    def next(self,edge):
+        for i,_edge in enumerate(self.edgeLoop):
+            if _edge == edge:
+                return wrapAroundIndex(i,1)
+        return None
                         
     def wrapAroundIndex(self,i,loc):
         return (i+loc) % len(self.edgeLoop)
