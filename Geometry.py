@@ -3,8 +3,8 @@ import numpy as np
 class vertex:
     def __init__(self,loc):
         self.uid = 1
-        if type(loc,list) and len(loc) == 3:
-            self.pos = np.array(loc)
+        if len(loc) == 3: #isinstance(loc,'list')
+            self.pos = np.array(loc,dtype=float)
         else:
             #TODO Raise error for invalid type cast
             pass
@@ -17,7 +17,7 @@ class vertex:
         return (test[0] and test[0])
 
     def distanceToVertex(self, other):
-        return numpy.linalg.norm(self.pos-other.pos)
+        return np.linalg.norm(self.pos-other.pos)
 
 class edge:
     def __init__(self,vertexA, vertexB):
@@ -36,29 +36,31 @@ class edge:
 
         return (AB + tol >= AV + VB) and (AB - tol <= AV + AB)
 
-    @static
-    def perpendicular(a):
-        b = np.empty_like(a)
-        b[0] = -a[1]
-        b[1] = a[0]
-        return b
-
     def intersectEdge(self,other):
         da = self.vertexB-self.vertexA
         db = other.vertexB-other.vertexA
         dp = self.vertexA - other.vertexA
         dap = self.perpendicular(a)
         denom = np.dot(dap,db)
-        if denom 
-        num = np.dot(dap,dp)
-        return (num / denom.astype(float))*db + other.vertexA
+        if denom != 0: 
+            num = np.dot(dap,dp)
+            return (num / denom.astype(float))*db + other.vertexA
+        else:
+            return None
+
+    @staticmethod
+    def perpendicular(a):
+        b = np.empty_like(a)
+        b[0] = -a[1]
+        b[1] = a[0]
+        return b
 
 class orderEdgeLoop:
     def __init__(self,edgeLoop=[]):
         self.edgeLoop = edgeLoop
         self.valid = self.isLoop()
         
-    def insertEdgeAfterIndex(self,edge,after=None)
+    def insertEdgeAfterIndex(self,edge,after=None):
         '''Given an edge, index to insert after'''        
         v1N = edge.vertexA
         v2N = edge.vertexB
@@ -124,3 +126,12 @@ class mesh:
     def findVolume(self):
         if isClosed():
             return 9000.0
+
+if __name__ == '__main__':
+
+    v1 = vertex([0,0,0])
+    v2 = vertex([0,0,10])
+    v3 = vertex([0,-5,0])
+    v4 = vertex([0,5,0])
+
+
