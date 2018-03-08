@@ -66,29 +66,22 @@ class edge:
         for L1 to find the intersection point.
         '''
         da = self.vertexB-self.vertexA
-        mag_da = np.linalg.norm(da)
-        dVa = da/mag_da
-        
         db = other.vertexB-other.vertexA
-        mag_db = np.linalg.norm(db)
-        dVb = db/mag_db
-        
         dp =  other.vertexA -self.vertexA
-        mag_dp = np.linalg.norm(dp)
-        dVp = dp/mag_dp
                 
         #Left and right side must be parallel, test this cos theta = (dVa * dVb)/(mag_da*mag_db)
-        left = np.cross(dVa,dVb)
+        left = np.cross(da,db)
         mag_left = np.linalg.norm(left)
-        right = np.cross(dVp,dVb)
+        right = np.cross(dp,db)
         mag_right = np.linalg.norm(right)
         angleBtwn = np.arccos(np.dot(left,right)/(mag_left*mag_right))
+        
         if angleBtwn == 0.0 or angleBtwn == np.pi:
-            
             print "Lines will intersect"
+            a = mag_right/mag_left
+            intPt = self.vertexA.pos + (a * da)
         else:
             print "Never intersect"
-        
         return None
 class orderEdgeLoop:
     def __init__(self,edgeLoop=[]):
