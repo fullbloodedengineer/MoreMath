@@ -27,7 +27,7 @@ def parseAsciiVertex(line):
     return (float(x),float(y),float(z))
 
 def parseFacet(data,n):
-    '''Read 7 lines of ascii, data is on line 0,2,3,4'''
+    '''Read n lines of ascii, data is on line 0,2-(n+2)'''
     normal = data[0].split()[2:]
     vertex = [ parseAsciiVertex(d) for d in data[2:n+2] ]
     return normal,vertex
@@ -57,7 +57,7 @@ def readAscii(stlFile_abspath,n):
         header = oFile.readline().split()[0]
         data = True
         while data: #Read the facets
-            data = [ oFile.readline() for i in range(7) ]
+            data = [ oFile.readline() for i in range(n) ]
             if '' not in data:
                 normal,vertex = parseFacet(data,n)
                 facets.append(normal)
