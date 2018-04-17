@@ -1,4 +1,4 @@
-import struct
+ import struct
 import time
 
 '''
@@ -27,7 +27,7 @@ def parseAsciiVertex(line):
     return (float(x),float(y),float(z))
 
 def parseFacet(data,n):
-    '''Read n lines of ascii, data is on line 0,2-(n+2)'''
+    '''Read 7 lines of ascii, data is on line 0,2,3,4'''
     normal = data[0].split()[2:]
     vertex = [ parseAsciiVertex(d) for d in data[2:n+2] ]
     return normal,vertex
