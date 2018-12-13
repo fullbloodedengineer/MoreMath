@@ -4,7 +4,6 @@ import random
 from scipy.spatial import KDTree
 import timeit,cProfile
 import functools
-# read points into array
 
 class Tree:
     def __init__(self,pts):
