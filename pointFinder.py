@@ -13,16 +13,20 @@ class Tree:
         self.tree = KDTree(self.a, leafsize=10)#smaller leaf size takes longer to build but faster to search
 
     def find_pts(self,test_pt,search_radius):
-        distances, ndx = self.tree.query([test_pt], k=5, distance_upper_bound=search_radius)
+        distances, ndx = self.tree.query(test_pts, k=5, distance_upper_bound=search_radius)
         #print distances[0]
         #print ndx[0]
-        index_list = [ndx[0][i] for i,d in enumerate(distances[0]) if d != numpy.inf]
-        return index_list
+        allIndex = []
+        for dist in distances:
+            index_list = [ndx[0][i] for i,d in enumerate(dist) if d != numpy.inf]
+            allIndex.append(index_list)
+        return allIndex
 
     def findRandom(self,search_radius):
         pt = create_random_point()
         indexes = tree.find_pts(pt,search_radius)
-        print "Found %s within range" %(len(indexes))
+        for i in indexes:
+            print "Found %s within range" %(len(i))
               
 def create_points(count):
     data = []
@@ -36,6 +40,14 @@ def create_random_point():
 if __name__ == "__main__":
     pts = create_points(10**6)
     tree = Tree(pts)
+
+    test_pts = create_points(1000)
     sT = time.time()
-    for i in xrange(1000000): tree.findRandom(100)
-    print "Completed in",time.time()-sT
+    #for i in xrange(1000000): tree.findRandom(100)
+
+    #Testing all points at once completes in 0.8seconds
+    indexes = tree.find_pts(test_pts,100)
+    fT = time.time()
+    for i in indexes:
+            print "Found %s within range" %(len(i))
+    print "Completed in",fT-sT
