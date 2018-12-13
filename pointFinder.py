@@ -12,8 +12,8 @@ class Tree:
 
     def find_pts(self,test_pt,search_radius):
         distances, ndx = self.tree.query([test_pt], k=5, distance_upper_bound=search_radius)
-        print distances[0]
-        print ndx
+        #print distances[0] #We only tested one point so its a single array
+        #print ndx[0]
         index_list = [ndx[0][i] for i,d in enumerate(distances[0]) if d != numpy.inf]
         return index_list
 
